@@ -6,3 +6,6 @@ Prof: Francesco Recchia, Matteo Zuin, Gabriele Simi
 
 ANALISI DELL'ESPERIMENTO GAMMA - ENVIROMENTAL RADIOACTIVITY
 
+Potete usare i file di analisi come ispirazione ma non potete copiarli o diffonderli (vedere file LICENSE) 
+
+Se volete informazioni scrivetemi all'indirizzo benedetta.rasera@studenti.unipd.it
