@@ -630,4 +630,3 @@ def breitwigner(x, y, sx=None, sy=None, xlabel="X-axis", ylabel="Y-axis"):
     plt.show()
 
     return a, gamma, x0, residui, chi_squared, chi_squared_reduced
-
