@@ -266,7 +266,7 @@ def linear_regression(x, y, sx=None, sy=None, xlabel="X-axis", ylabel="Y-axis"):
     else:
         plt.scatter(x, y, color='black', label='Data', s=3)
     
-    plt.plot(x, linear(x, *params), color='red', label='Linear fit', lw=2)
+    plt.plot(x, linear(x, *params), color='red', label='Linear fit', lw=1)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title("Linear Fit")
@@ -283,7 +283,7 @@ def linear_regression(x, y, sx=None, sy=None, xlabel="X-axis", ylabel="Y-axis"):
                      markersize=4, capsize=2)
     else:
         plt.scatter(x, residui, color='black', alpha=0.6, label='Residuals', s=10)
-    plt.axhline(0, color='red', linestyle='--', lw=2)
+    plt.axhline(0, color='red', linestyle='--', lw=1.5)
     plt.xlabel(xlabel)
     plt.ylabel(f"(data - fit)")
     plt.title("Residuals")
