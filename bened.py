@@ -52,6 +52,187 @@ def chi2(model, params, x, y, sx=None, sy=None):
     return chi2_val
 
 
+#NORMAL DISTRIBUTION, TO MAKE MULTIPLE PLOTS
+def normal_PLOT(data=None, bin_centers=None, counts=None, xlabel="X-axis", ylabel="Y-axis", titolo='title', 
+           xmin=None, xmax=None, x1=None, x2=None, b=None, n=None):
+    if data is not None:
+        frame = inspect.currentframe().f_back
+        var_name = [name for name, val in frame.f_locals.items() if val is data][0]
+
+        # Calcolo bin
+        if b is not None:
+            bins = b
+        else:
+            bins = calculate_bins(data)
+
+        counts, bin_edges = np.histogram(data, bins=bins, density=False)
+        bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+    elif bin_centers is not None and counts is not None:
+        var_name = "custom_data"
+        bin_edges = None  # Non usiamo bin_edges
+    else:
+        raise ValueError("Devi fornire o `data`, o `bin_centers` e `counts`.")
+
+    sigma_counts = np.sqrt(counts)  # Errori sulle y
+
+    # Range per il fit
+    if xmin is not None and xmax is not None:
+        fit_mask = (bin_centers >= xmin) & (bin_centers <= xmax)
+        bin_centers_fit = bin_centers[fit_mask]
+        counts_fit = counts[fit_mask]
+        sigma_counts_fit = sigma_counts[fit_mask]
+    else:
+        bin_centers_fit = bin_centers
+        counts_fit = counts
+        sigma_counts_fit = sigma_counts
+
+    # Fit gaussiano
+    initial_guess = [max(counts_fit), np.mean(bin_centers_fit), np.std(bin_centers_fit)]
+    params, cov_matrix = curve_fit(gaussian, bin_centers_fit, counts_fit, p0=initial_guess)
+    amp, mu, sigma = params
+    uncertainties = np.sqrt(np.diag(cov_matrix))
+    amp_uncertainty, mu_uncertainty, sigma_uncertainty = uncertainties
+
+    print(f"Ampiezza = {amp} ± {amp_uncertainty}")
+    print(f"Media = {mu} ± {mu_uncertainty}")
+    print(f"Sigma = {sigma} ± {sigma_uncertainty}")
+
+    # Calcolo del chi-quadro
+    fit_values = gaussian(bin_centers_fit, *params)
+    chi_quadro = np.sum(((counts_fit - fit_values) / sigma_counts_fit) ** 2)
+    degrees_of_freedom = len(counts_fit) - len(params)
+    reduced_chi_quadro = chi_quadro / degrees_of_freedom
+    print(f"Chi-quadro = {chi_quadro}")
+    print(f"Chi-quadro ridotto = {reduced_chi_quadro}")
+    # Residui
+    data_residui = res(counts_fit, fit_values)
+    globals()[f"{var_name}_residui"] = data_residui
+    residui = globals()[f"{var_name}_residui"]
+
+    # Calcolo dell'integrale dell'istogramma nel range media ± n*sigma
+    if n is not None:
+        lower_bound = mu - n * sigma
+        upper_bound = mu + n * sigma
+        bins_to_integrate = np.where((bin_centers >= lower_bound) & (bin_centers <= upper_bound))[0]
+        integral = np.sum(counts[bins_to_integrate])
+        print(f"Integrale dell'istogramma nel range [{lower_bound}, {upper_bound}] = {integral}")
+
+    # Creiamo i dati della Gaussiana sul range X definito
+    if xmin is not None and xmax is not None:
+        x_fit = np.linspace(xmin, xmax, 10000)
+    else:
+        x_fit = np.linspace(bin_centers[0], bin_centers[-1], 10000)
+    y_fit = gaussian(x_fit, *params)
+
+    print(f'-----------------------------------------------')
+    # # Plot dell'istogramma e del fit
+    # plt.bar(bin_centers, counts, width=(bin_centers[1] - bin_centers[0]), alpha=0.6, label="Data")
+    # plt.plot(x_fit, y_fit, color='red', label='Gaussian fit', lw=2)
+    # plt.ylim(np.min(y_fit) * 1.1, np.max(y_fit) * 1.1)  # Adattiamo il limite Y per il range X specificato
+    # if x1 is not None and x2 is not None:  # limiti asse x
+    #     plt.xlim(x1, x2)
+    # else:
+    #     plt.xlim(mu - 3 * sigma, mu + 3 * sigma)
+    # plt.xlabel(xlabel)
+    # plt.ylabel(ylabel)
+    # plt.title(titolo)
+    # plt.grid(alpha=0.5)
+    # plt.legend()
+    # plt.show()
+
+    # # Plot dei residui
+    # plt.errorbar(bin_centers_fit, data_residui, yerr=sigma_counts_fit, alpha=0.6, label="Residuals", fmt='o',
+    #              markersize=4, capsize=2)
+    # plt.axhline(0, color='black', linestyle='--', lw=2)
+    # if xmin is not None and xmax is not None:
+    #     plt.xlim(xmin, xmax)
+    # else:
+    #     plt.xlim(mu - 5 * sigma, mu + 5 * sigma)
+    # plt.xlabel(xlabel)
+    # plt.ylabel("(data - fit)")
+    # plt.title('Residuals')
+    # plt.grid(alpha=0.5)
+    # plt.legend()
+    # plt.show()
+
+    plot = [bin_centers, counts, x_fit, y_fit]
+
+    return params, uncertainties, data_residui, chi_quadro, reduced_chi_quadro, plot
+
+#SOTTRAZIONE BACKGROUND
+def background(data, fondo, bins=None, xlabel="X-axis", ylabel="Counts", titolo='Title'):
+    # Calcola i bin
+    if bins is None:
+        bins = max(int(data.max()), int(fondo.max()))
+
+    # Creazione degli istogrammi
+    data_hist, bin_edges = np.histogram(data, bins=bins, range=(0, bins))
+    background_hist, _ = np.histogram(fondo, bins=bins, range=(0, bins))
+
+    # Normalizzazione del background
+    if background_hist.sum() > 0:  # Per evitare divisione per zero
+        background_scaled = background_hist * (data_hist.sum() / background_hist.sum())
+    else:
+        background_scaled = background_hist
+
+    # Sottrazione del background
+    corrected_hist = data_hist - background_scaled
+
+    # Evitiamo valori negativi
+    corrected_hist[corrected_hist < 0] = 0
+
+    # Centri dei bin
+    bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+
+    # Visualizzazione
+    #QUI NON HA SENSO PLT.HIST PERCHé QUELLO USA UN ARRAY DI DATI E CREA LUI L'ISTOGRAMMA MENTRE NOI ABBIAMO UN ARRAY GIà CON I COUNTS BIN PER BIN
+    plt.figure(figsize=(6.4, 4.8))
+    plt.step(bin_centers, corrected_hist, label="Background subtracted", color='blue')
+    # plt.bar(bin_centers, corrected_hist, width=np.diff(bin_edges), color='blue', alpha=0.5, label="Background subtracted") questo fa le barre colorate
+    plt.legend()
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(titolo)
+    plt.grid(True)
+    plt.show()
+
+    return bin_centers, corrected_hist
+
+def background_PLOT(data, fondo, bins=None, xlabel="X-axis", ylabel="Counts", titolo='Title'):
+    # Calculate the bins
+    if bins is None:
+        bins = max(int(data.max()), int(fondo.max()))
+
+    # Create histograms
+    data_hist, bin_edges = np.histogram(data, bins=bins, range=(0, bins))
+    background_hist, _ = np.histogram(fondo, bins=bins, range=(0, bins))
+
+    # Normalize the background
+    if background_hist.sum() > 0:  # Avoid division by zero
+        background_scaled = background_hist * (data_hist.sum() / background_hist.sum())
+    else:
+        background_scaled = background_hist
+
+    # Subtract the background
+    corrected_hist = data_hist - background_scaled
+
+    # Avoid negative values
+    corrected_hist[corrected_hist < 0] = 0
+
+    # Bin centers
+    bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+
+    # Plotting
+    fig, ax = plt.subplots(figsize=(8.4, 6.8))
+    ax.legend()
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.set_title(titolo)
+    ax.grid(True)
+    
+    # Return figure and axes for external modifications
+    return fig, ax, bin_centers, corrected_hist
+
 #NORMAL DISTRIBUTION
 def normal(data=None, bin_centers=None, counts=None, xlabel="X-axis", ylabel="Y-axis", titolo='title', 
            xmin=None, xmax=None, x1=None, x2=None, b=None, n=None):
@@ -158,44 +339,6 @@ def normal(data=None, bin_centers=None, counts=None, xlabel="X-axis", ylabel="Y-
 
     return amp, amp_uncertainty, mu, mu_uncertainty, sigma, sigma_uncertainty, residui, chi_quadro, reduced_chi_quadro
 
-#SOTTRAZIONE BACKGROUND
-def background(data, fondo, bins=None, xlabel="X-axis", ylabel="Counts", titolo='Title'):
-    # Calcola i bin
-    if bins is None:
-        bins = max(int(data.max()), int(fondo.max()))
-
-    # Creazione degli istogrammi
-    data_hist, bin_edges = np.histogram(data, bins=bins, range=(0, bins))
-    background_hist, _ = np.histogram(fondo, bins=bins, range=(0, bins))
-
-    # Normalizzazione del background
-    if background_hist.sum() > 0:  # Per evitare divisione per zero
-        background_scaled = background_hist * (data_hist.sum() / background_hist.sum())
-    else:
-        background_scaled = background_hist
-
-    # Sottrazione del background
-    corrected_hist = data_hist - background_scaled
-
-    # Evitiamo valori negativi
-    corrected_hist[corrected_hist < 0] = 0
-
-    # Centri dei bin
-    bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
-
-    # Visualizzazione
-    #QUI NON HA SENSO PLT.HIST PERCHé QUELLO USA UN ARRAY DI DATI E CREA LUI L'ISTOGRAMMA MENTRE NOI ABBIAMO UN ARRAY GIà CON I COUNTS BIN PER BIN
-    plt.figure(figsize=(6.4, 4.8))
-    plt.step(bin_centers, corrected_hist, label="Background subtracted", color='blue')
-    # plt.bar(bin_centers, corrected_hist, width=np.diff(bin_edges), color='blue', alpha=0.5, label="Background subtracted") questo fa le barre colorate
-    plt.legend()
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.title(titolo)
-    plt.grid(True)
-    plt.show()
-
-    return bin_centers, corrected_hist
 
 # REGRESSIONE LINEARE
 def linear_regression(x, y, sx=None, sy=None, xlabel="X-axis", ylabel="Y-axis"):
