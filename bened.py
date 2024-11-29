@@ -148,7 +148,7 @@ def normal(data, xlabel="X-axis", ylabel="Y-axis", titolo='title', xmin=None, xm
     plt.legend()
     plt.show()
 
-    return amp, mu, sigma, residui, chi_quadro, reduced_chi_quadro
+    return amp, amp_uncertainty, mu, mu_uncertainty, sigma, sigma_uncertainty, residui, chi_quadro, reduced_chi_quadro
 
 #SOTTRAZIONE BACKGROUND
 def background(data, fondo, bins=None, xlabel="X-axis", ylabel="Counts", titolo='Title'):
