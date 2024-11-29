@@ -130,10 +130,10 @@ def normal(data=None, bin_centers=None, counts=None, xlabel="X-axis", ylabel="Y-
     plt.bar(bin_centers, counts, width=(bin_centers[1] - bin_centers[0]), alpha=0.6, label="Data")
     plt.plot(x_fit, y_fit, color='red', label='Gaussian fit', lw=2)
     plt.ylim(np.min(y_fit) * 1.1, np.max(y_fit) * 1.1)  # Adattiamo il limite Y per il range X specificato
-    if xmin is not None and xmax is not None:  # limiti asse x
-        plt.xlim(xmin, xmax)
-    else:
-        plt.xlim(mu - 5 * sigma, mu + 5 * sigma)
+    # if xmin is not None and xmax is not None:  # limiti asse x
+    #     plt.xlim(xmin, xmax)
+    # else:
+    plt.xlim(mu - 3 * sigma, mu + 3 * sigma)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(titolo)
