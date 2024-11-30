@@ -420,7 +420,7 @@ def linear_regression(x, y, sx=None, sy=None, xlabel="X-axis", ylabel="Y-axis", 
     # Plot dei residui
     plt.figure(figsize=(6.4, 4.8))
     if fit_with_weights:
-        plt.errorbar(x, residui, xerr=sx, yerr=sy if np.any(sx != 0) else None,
+        plt.errorbar(x, residui, xerr=sx if np.any(sx != 0) else None,
                      yerr=sy if np.any(sy != 0) else None,
                      fmt='o', color='black', alpha=0.6, label='Residuals',
                      markersize=4, capsize=2)
