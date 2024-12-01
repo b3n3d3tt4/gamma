@@ -157,7 +157,7 @@ def normal_PLOT(data=None, bin_centers=None, counts=None, xlabel="X-axis", ylabe
 
     plot = [bin_centers, counts, x_fit, y_fit]
 
-    return params, uncertainties, data_residui, chi_quadro, reduced_chi_quadro, plot
+    return params, uncertainties, data_residui, chi_quadro, reduced_chi_quadro, plot, integral
 
 #SOTTRAZIONE BACKGROUND
 def background(data, fondo, bins=None, xlabel="X-axis", ylabel="Counts", titolo='Title'):
