@@ -434,7 +434,7 @@ def linear_regression(x, y, sx=None, sy=None, xlabel="X-axis", ylabel="Y-axis", 
     plt.legend()
     plt.show()
 
-    return m, q, residui, chi_squared, chi_squared_reduced
+    return m, q, m_uncertainty, q_uncertainty, residui, chi_squared, chi_squared_reduced
 
 # Funzione per il fit esponenziale
 def exponential(x, y, sx=None, sy=None, xlabel="X-axis", ylabel="Y-axis"):
