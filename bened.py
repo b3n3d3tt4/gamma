@@ -114,7 +114,7 @@ def normal_PLOT(data=None, bin_centers=None, counts=None, xlabel="X-axis", ylabe
         lower_bound = mu - n * sigma
         upper_bound = mu + n * sigma
         bins_to_integrate = np.where((bin_centers >= lower_bound) & (bin_centers <= upper_bound))[0]
-        integral = np.sum(counts[bins_to_integrate])
+        integral = int(np.sum(counts[bins_to_integrate]))
         print(f"Integrale dell'istogramma nel range [{lower_bound}, {upper_bound}] = {integral}")
 
     # Creiamo i dati della Gaussiana sul range X definito
@@ -297,7 +297,7 @@ def normal(data=None, bin_centers=None, counts=None, xlabel="X-axis", ylabel="Y-
         lower_bound = mu - n * sigma
         upper_bound = mu + n * sigma
         bins_to_integrate = np.where((bin_centers >= lower_bound) & (bin_centers <= upper_bound))[0]
-        integral = np.sum(counts[bins_to_integrate])
+        integral = int(np.sum(counts[bins_to_integrate]))
         print(f"Integrale dell'istogramma nel range [{lower_bound}, {upper_bound}] = {integral}")
 
     # Creiamo i dati della Gaussiana sul range X definito
