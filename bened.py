@@ -107,7 +107,7 @@ def normal_PLOT(data=None, bin_centers=None, counts=None, xlabel="X-axis", ylabe
         upper_bound = mu + n * sigma
         bins_to_integrate = (bin_centers >= lower_bound) & (bin_centers <= upper_bound) #il return è un array booleano con true e false che poi si mette come maskera
         integral = int(np.sum(counts[bins_to_integrate]))
-        integral_uncertainty = np.sqrt(np.sum(sigma_counts[bins_to_integrate]**2))
+        integral_uncertainty = int(np.sqrt(np.sum(sigma_counts[bins_to_integrate]**2)))
         print(f"Integrale dell'istogramma nel range [{lower_bound}, {upper_bound}] = {integral} ± {integral_uncertainty}")
 
     # Creiamo i dati della Gaussiana sul range X definito
