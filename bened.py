@@ -237,10 +237,6 @@ def background_PLOT(data, fondo, bins=None, xlabel="X-axis", ylabel="Counts", ti
 def normal(data=None, bin_centers=None, counts=None, xlabel="X-axis", ylabel="Y-axis", titolo='title', 
            xmin=None, xmax=None, x1=None, x2=None, b=None, n=None):
     if data is not None:
-        frame = inspect.currentframe().f_back
-        var_name = [name for name, val in frame.f_locals.items() if val is data][0]
-
-        # Calcolo bin
         if b is not None:
             bins = b
         else:
@@ -249,7 +245,6 @@ def normal(data=None, bin_centers=None, counts=None, xlabel="X-axis", ylabel="Y-
         counts, bin_edges = np.histogram(data, bins=bins, density=False)
         bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
     elif bin_centers is not None and counts is not None:
-        var_name = "custom_data"
         bin_edges = None  # Non usiamo bin_edges
     else:
         raise ValueError("Devi fornire o `data`, o `bin_centers` e `counts`.")
@@ -289,8 +284,6 @@ def normal(data=None, bin_centers=None, counts=None, xlabel="X-axis", ylabel="Y-
 
     # Residui
     data_residui = res(counts_fit, fit_values)
-    globals()[f"{var_name}_residui"] = data_residui
-    residui = globals()[f"{var_name}_residui"]
 
     # Calcolo dell'integrale dell'istogramma nel range media ± n*sigma
     if n is not None:
@@ -337,7 +330,7 @@ def normal(data=None, bin_centers=None, counts=None, xlabel="X-axis", ylabel="Y-
     plt.legend()
     plt.show()
 
-    return amp, amp_uncertainty, mu, mu_uncertainty, sigma, sigma_uncertainty, residui, chi_quadro, reduced_chi_quadro
+    return amp, amp_uncertainty, mu, mu_uncertainty, sigma, sigma_uncertainty, data_residui, chi_quadro, reduced_chi_quadro
 
 
 # REGRESSIONE LINEARE
