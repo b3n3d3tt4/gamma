@@ -401,7 +401,6 @@ def linear_regression(x, y, sx=None, sy=None, xlabel="X-axis", ylabel="Y-axis", 
     plt.title(titolo)
     plt.grid(alpha=0.5)
     plt.legend()
-    plt.savefig(f'{titolo}.pdf')
     plt.show()
 
     # Plot dei residui
@@ -419,7 +418,6 @@ def linear_regression(x, y, sx=None, sy=None, xlabel="X-axis", ylabel="Y-axis", 
     plt.title("Residuals")
     plt.grid(alpha=0.5)
     plt.legend()
-    plt.savefig(f'residui_{titolo}.pdf')
     plt.show()
 
     return m, q, m_uncertainty, q_uncertainty, residui, chi_squared, chi_squared_reduced
