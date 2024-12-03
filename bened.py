@@ -163,7 +163,7 @@ def background(data, fondo, bins=None, xlabel="X-axis", ylabel="Counts", titolo=
 
     # Normalizzazione del background
     if background_hist.sum() > 0:  # Per evitare divisione per zero
-        background_scaled = background_hist * (data_hist.sum() / background_hist.sum())
+        background_scaled = background_hist * (data_hist.sum() / background_hist.sum()) #questo comporta che background scaled non sarà int
     else:
         background_scaled = background_hist
 
