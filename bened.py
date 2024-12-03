@@ -56,19 +56,13 @@ def chi2(model, params, x, y, sx=None, sy=None):
 def normal_PLOT(data=None, bin_centers=None, counts=None, xlabel="X-axis", ylabel="Y-axis", titolo='title', 
            xmin=None, xmax=None, x1=None, x2=None, b=None, n=None):
     if data is not None:
-        frame = inspect.currentframe().f_back
-        var_name = [name for name, val in frame.f_locals.items() if val is data][0]
-
-        # Calcolo bin
         if b is not None:
             bins = b
         else:
             bins = calculate_bins(data)
-
         counts, bin_edges = np.histogram(data, bins=bins, density=False)
         bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
     elif bin_centers is not None and counts is not None:
-        var_name = "custom_data"
         bin_edges = None  # Non usiamo bin_edges
     else:
         raise ValueError("Devi fornire o `data`, o `bin_centers` e `counts`.")
@@ -106,14 +100,12 @@ def normal_PLOT(data=None, bin_centers=None, counts=None, xlabel="X-axis", ylabe
     print(f"Chi-quadro ridotto = {reduced_chi_quadro}")
     # Residui
     data_residui = res(counts_fit, fit_values)
-    globals()[f"{var_name}_residui"] = data_residui
-    residui = globals()[f"{var_name}_residui"]
 
     # Calcolo dell'integrale dell'istogramma nel range media ± n*sigma
     if n is not None:
         lower_bound = mu - n * sigma
         upper_bound = mu + n * sigma
-        bins_to_integrate = np.where((bin_centers >= lower_bound) & (bin_centers <= upper_bound))[0]
+        bins_to_integrate = (bin_centers >= lower_bound) & (bin_centers <= upper_bound) #il return è un array booleano con true e false che poi si mette come maskera
         integral = int(np.sum(counts[bins_to_integrate]))
         print(f"Integrale dell'istogramma nel range [{lower_bound}, {upper_bound}] = {integral}")
 
