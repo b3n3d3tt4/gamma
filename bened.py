@@ -216,7 +216,7 @@ def background_PLOT(data, fondo, bins=None, xlabel="X-axis", ylabel="Counts", ti
     bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 
     # Plotting
-    fig, ax = plt.subplots(figsize=(8.4, 6.8))
+    fig, ax = plt.subplots(figsize=(6.4, 4.8))
     ax.legend()
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
