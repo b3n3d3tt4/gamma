@@ -325,7 +325,6 @@ def normal(data=None, bin_centers=None, counts=None, xlabel="X-axis", ylabel="Y-
 
     return amp, amp_uncertainty, mu, mu_uncertainty, sigma, sigma_uncertainty, data_residui, chi_quadro, reduced_chi_quadro
 
-
 # REGRESSIONE LINEARE
 def linear_regression(x, y, sx=None, sy=None, xlabel="X-axis", ylabel="Y-axis", titolo='title'):
     # Gestione degli errori
